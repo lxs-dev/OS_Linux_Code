@@ -45,7 +45,7 @@ void alarm_exit(void)
 {
 	//signal(SIGALRM,alarm_hardler_save);
 	//alarm(0);
-	for(int i = 0;i < NUM_MAX;i++)
+/*	for(int i = 0;i < NUM_MAX;i++)
 	{
 		if(token[i] != NULL)
 		{
@@ -53,21 +53,23 @@ void alarm_exit(void)
 			free(token[i]);
 		}
 	}
-	pthread_cancel(alarm_thread);
+*/	pthread_cancel(alarm_thread);
 	pthread_join(alarm_thread,NULL);
 }
+/*
 void init_token_token_lock()
 {
 	for(int i = 0;i < NUM_MAX;i++)
 		if(token[i] != NULL)
 			pthread_mutex_init(&(token[i]->mutex_t_token),NULL);
 }
+*/
 void alarm_init(void)
 {
 	//alarm_hardler_save = signal(SIGALRM,alarm_hardler);
 	//alarm(1);
 	pthread_create(&alarm_thread,NULL,alarm_hardler,NULL);
-	init_token_token_lock();
+//	init_token_token_lock();
 	atexit(alarm_exit);
 }
 int GetTokenSubscript()
@@ -95,6 +97,7 @@ token_t *token_init(int cps,int token_max)
 	me ->token = 0;
 	me ->token_max = token_max;
 	me ->subscript = i;
+	pthread_mutex_init(&me->mutex_t_token,NULL);
 	pthread_mutex_lock(&mutex_token);
 	i = GetTokenSubscript();
 	if(i < 0)
@@ -149,6 +152,7 @@ void token_destroy(token_t *tk)
 {
 	struct token_ts *me = tk;
 	pthread_mutex_lock(&mutex_token);
+	pthread_mutex_destroy(&me->mutex_t_token);
 	token[me->subscript] = NULL;
 	free(me);
 	pthread_mutex_unlock(&mutex_token);
