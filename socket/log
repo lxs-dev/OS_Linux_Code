@@ -1,0 +1,5 @@
+数据报：
+	1、datagram 	基础通信
+	2、datagram1	可可根据名字长度发送消息
+	3、datagram2	广播
+	4、datagram3	多播

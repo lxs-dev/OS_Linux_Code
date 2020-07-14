@@ -41,22 +41,27 @@ int main()
 		pthread_mutex_lock(&mutex);
 		while(num != 0)
 		{	
-			pthread_mutex_unlock(&mutex);
-			sched_yield();
-			pthread_mutex_lock(&mutex);
+		//	pthread_mutex_unlock(&mutex);
+		//	sched_yield();
+		//	pthread_mutex_lock(&mutex);
+			pthread_cond_wait(&cond,&mutex);
 		}
 		num = i;
+		pthread_cond_signal(&cond);
 		pthread_mutex_unlock(&mutex);
 	}
 	pthread_mutex_lock(&mutex);
 	while(num != 0)
 	{
-		pthread_mutex_unlock(&mutex);
-		sched_yield();
-		pthread_mutex_lock(&mutex);
+	//	pthread_mutex_unlock(&mutex);
+	//	sched_yield();
+	//	pthread_mutex_lock(&mutex);
+		
+		pthread_cond_wait(&cond,&mutex);
 	}
 //	debug(8888);
 	num = -1;
+	pthread_cond_broadcast(&cond);
 	pthread_mutex_unlock(&mutex);
 	for(i = 0; i < THRNUM ; i++ )
 	{	
@@ -76,9 +81,11 @@ void* func(void *p)
 		pthread_mutex_lock(&mutex);
 		while(num == 0)
 		{
-			pthread_mutex_unlock(&mutex);
-			sched_yield();
-			pthread_mutex_lock(&mutex);
+	//		pthread_mutex_unlock(&mutex);
+	//		sched_yield();
+	//		pthread_mutex_lock(&mutex);
+				
+			pthread_cond_wait(&cond,&mutex);
 		}
 		
 		if(num == -1)
@@ -88,6 +95,7 @@ void* func(void *p)
 		}
 		i = num;
 		num = 0;
+		pthread_cond_broadcast(&cond);
 		pthread_mutex_unlock(&mutex);
 		int adc = 1;
 		for(j=2;j<(i/2);j++)
